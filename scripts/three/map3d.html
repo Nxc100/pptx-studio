@@ -1,0 +1,130 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>html,body{margin:0;background:transparent;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head><body>
+<script type="module">
+// Config-driven extruded GeoJSON map. window.__CFG injected by render3d.py (see references/assets.md for keys).
+import * as THREE from 'three';
+import {Line2} from 'three/addons/lines/Line2.js';
+import {LineMaterial} from 'three/addons/lines/LineMaterial.js';
+import {LineGeometry} from 'three/addons/lines/LineGeometry.js';
+const cfg = window.__CFG;
+const [W, H] = cfg.size || [2400, 1800], DPR = cfg.dpr || 2;
+const cam0 = Object.assign({elev: 58, azim: 0, fov: 26, zoom: 1.18}, cfg.camera || {});
+const P = Object.assign({regions: ['E6DCC3', 'D6D9C1', 'CDD2B6', 'E2D5B8', 'D9D2B5'], side: '9C8766', edge: 'FBF6EC',
+  hl_top: 'B0623A', hl_side: '8E3B2E', hl_edge: 'B08D57', group_side: '7C8462', pin: 'C9A262', pole: '5E6B3D',
+  slab_top: 'EFE3CC', slab_side: '6A4A33', slab_edge: 'B08D57', special: '5E6B3D'}, cfg.palette || {});
+const hx = s => parseInt(String(s).replace('#', ''), 16);
+const Hh = Object.assign({base: 8, group: 18, highlight: 30, slab: 60}, cfg.heights || {});
+const gj = await (await fetch(cfg.geojson)).json();
+let minLon = 1e9, maxLon = -1e9, minLat = 1e9, maxLat = -1e9;
+const feats = gj.features.filter(f => f.geometry && /Polygon/.test(f.geometry.type));
+const polysOf = f => f.geometry.type === 'Polygon' ? [f.geometry.coordinates] : f.geometry.coordinates;
+for (const f of feats) for (const p of polysOf(f)) for (const [lon, lat] of p[0]) { minLon = Math.min(minLon, lon); maxLon = Math.max(maxLon, lon); minLat = Math.min(minLat, lat); maxLat = Math.max(maxLat, lat); }
+const lon0 = (minLon + maxLon) / 2, lat0 = (minLat + maxLat) / 2, kx = Math.cos(lat0 * Math.PI / 180);
+const S = 1000 / Math.max((maxLon - minLon) * kx, maxLat - minLat);
+const proj = (lon, lat) => [(lon - lon0) * kx * S, (lat - lat0) * S];
+const renderer = new THREE.WebGLRenderer({antialias: true, alpha: true, preserveDrawingBuffer: true});
+renderer.setPixelRatio(DPR); renderer.setSize(W, H); renderer.setClearColor(0, 0);
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene(), res = new THREE.Vector2(W * DPR, H * DPR);
+const ringToPts = ring => ring.map(([lon, lat]) => proj(lon, lat));
+function shapeFromPoly(poly) {
+  const sh = new THREE.Shape(ringToPts(poly[0]).map(([x, y]) => new THREE.Vector2(x, y)));
+  for (const h of poly.slice(1)) sh.holes.push(new THREE.Path(ringToPts(h).map(([x, y]) => new THREE.Vector2(x, y))));
+  return sh;
+}
+function polyArea(pts) { let a = 0; for (let i = 0; i < pts.length; i++) { const [x1, y1] = pts[i], [x2, y2] = pts[(i + 1) % pts.length]; a += x1 * y2 - x2 * y1; } return Math.abs(a / 2); }
+function fatLine(pts2d, y, color, width) {
+  const arr = []; for (const [x, yy] of pts2d) arr.push(x, y, -yy); arr.push(arr[0], arr[1], arr[2]);
+  const g = new LineGeometry(); g.setPositions(arr);
+  const m = new LineMaterial({color, linewidth: width * DPR, worldUnits: false}); m.resolution.copy(res);
+  const l = new Line2(g, m); l.computeLineDistances(); return l;
+}
+function addRegion(f, {h, top, side, edge, edgeW = 1.2, base = 0}) {
+  const topMat = new THREE.MeshStandardMaterial({color: top, roughness: .9}), sideMat = new THREE.MeshStandardMaterial({color: side, roughness: .85});
+  for (const p of polysOf(f)) {
+    const pts = ringToPts(p[0]);
+    const g = new THREE.ExtrudeGeometry(shapeFromPoly(p), {depth: h, bevelEnabled: false, curveSegments: 1});
+    g.rotateX(-Math.PI / 2); g.translate(0, base, 0);
+    const m = new THREE.Mesh(g, [topMat, sideMat]); m.castShadow = true; m.receiveShadow = true; scene.add(m);
+    if (edge !== undefined && pts.length > 3) scene.add(fatLine(pts, base + h + 0.15, edge, edgeW));
+  }
+}
+const hashColor = (code, list) => hx(list[Math.abs(String(code).split('').reduce((a, c) => (a * 31 + c.charCodeAt(0)) | 0, 7)) % list.length]);
+function anchor(f) {
+  const c = f.properties.centroid || f.properties.center; if (c) return proj(c[0], c[1]);
+  let best = null, ba = -1; for (const p of polysOf(f)) { const pts = ringToPts(p[0]); const a = polyArea(pts); if (a > ba) { ba = a; best = pts; } }
+  let sx = 0, sy = 0; best.forEach(([x, y]) => { sx += x; sy += y; }); return [sx / best.length, sy / best.length];
+}
+const gold = () => new THREE.MeshStandardMaterial({color: hx(P.pin), metalness: .55, roughness: .3, emissive: 0x3a2a10, emissiveIntensity: .25});
+const labelPts = {}, pinPts = {};
+const groups = cfg.groups || {};                      // {adcode: colour} mid-tier regions (slightly raised)
+const code = f => String(f.properties.adcode ?? f.properties.code ?? f.properties.name);
+if (cfg.slab) {                                       // single region as a thick slab with POI pins
+  const f = feats[0], T = Hh.slab;
+  addRegion(f, {h: T, top: hx(P.slab_top), side: hx(P.slab_side), edge: hx(P.slab_edge), edgeW: 4.5});
+  const pts = ringToPts(polysOf(f)[0][0]); let cx = 0, cy = 0; pts.forEach(([x, y]) => { cx += x; cy += y; });
+  labelPts[f.properties.name || 'region'] = [cx / pts.length, cy / pts.length, T];
+  const pole = new THREE.MeshStandardMaterial({color: hx(P.pole), roughness: .6});
+  (cfg.pois || []).forEach(([name, lat, lon], i) => {
+    const [x, y] = proj(lon, lat), PH = [95, 125, 110, 140, 80, 100][i % 6];
+    const c = new THREE.Mesh(new THREE.CylinderGeometry(2.8, 2.8, PH, 16), pole); c.position.set(x, T + PH / 2, -y); c.castShadow = true; scene.add(c);
+    const s = new THREE.Mesh(new THREE.SphereGeometry(11.5, 48, 32), gold()); s.position.set(x, T + PH + 8, -y); s.castShadow = true; scene.add(s);
+    const ring = new THREE.Mesh(new THREE.RingGeometry(9, 12.5, 48), new THREE.MeshBasicMaterial({color: hx(P.pole), transparent: true, opacity: .8, side: THREE.DoubleSide}));
+    ring.rotation.x = -Math.PI / 2; ring.position.set(x, T + .35, -y); scene.add(ring);
+    pinPts[name] = [x, y, T + PH + 8];
+  });
+} else {
+  let hl = null;
+  for (const f of feats) {
+    const c = code(f);
+    if (cfg.special_contains && c.includes(cfg.special_contains)) { addRegion(f, {h: 3, top: hx(P.special), side: hx(P.special)}); continue; }  // e.g. China 9-dash line 'JD'
+    if (String(cfg.highlight) === c) { hl = f; continue; }
+    const g = groups[c];
+    const h = g ? Hh.group : Hh.base;
+    addRegion(f, {h, top: g ? hx(g) : hashColor(c, P.regions), side: hx(g ? P.group_side : P.side), edge: hx(P.edge), edgeW: 1.5});
+    if (f.properties.name) labelPts[f.properties.name] = anchor(f).concat([h]);
+  }
+  if (hl) {
+    addRegion(hl, {h: Hh.highlight, top: hx(P.hl_top), side: hx(P.hl_side), edge: hx(P.hl_edge), edgeW: 3.2});
+    const [ax, ay] = anchor(hl); labelPts[hl.properties.name] = [ax, ay, Hh.highlight];
+    if (cfg.pin) {
+      const ph = Hh.highlight, k = cfg.pin_scale || 1;
+      const cone = new THREE.Mesh(new THREE.ConeGeometry(8 * k, 26 * k, 40), gold()); cone.rotation.x = Math.PI; cone.position.set(ax, ph + 14 * k, -ay); cone.castShadow = true; scene.add(cone);
+      const sph = new THREE.Mesh(new THREE.SphereGeometry(8.4 * k, 48, 32), gold()); sph.position.set(ax, ph + 28 * k, -ay); sph.castShadow = true; scene.add(sph);
+      for (const [r, op] of [[9, .95], [14, .6], [19, .3]]) {
+        const ring = new THREE.Mesh(new THREE.RingGeometry((r - 1.2) * k, r * k, 64), new THREE.MeshBasicMaterial({color: hx(P.hl_edge), transparent: true, opacity: op, side: THREE.DoubleSide}));
+        ring.rotation.x = -Math.PI / 2; ring.position.set(ax, ph + 0.4, -ay); scene.add(ring);
+      }
+      pinPts[hl.properties.name] = [ax, ay, ph + 37 * k];
+    }
+  }
+}
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(8000, 8000), new THREE.ShadowMaterial({opacity: 0.2}));
+ground.rotation.x = -Math.PI / 2; ground.position.y = -0.3; ground.receiveShadow = true; scene.add(ground);
+const L = Object.assign({hemi: 2.0, sun: 1.35}, cfg.light || {});
+scene.add(new THREE.HemisphereLight(0xFFF9EF, 0xB5A383, L.hemi));
+const sun = new THREE.DirectionalLight(0xFFF1E2, L.sun); sun.position.set(-500, 900, 300);
+sun.castShadow = true; sun.shadow.mapSize.set(4096, 4096);
+Object.assign(sun.shadow.camera, {left: -800, right: 800, top: 800, bottom: -800, near: 10, far: 4000}); sun.shadow.camera.updateProjectionMatrix();
+sun.shadow.radius = 5; sun.shadow.bias = -0.0005; sun.shadow.normalBias = 0.5; scene.add(sun);
+const fill = new THREE.DirectionalLight(0xFFF3E2, 0.35); fill.position.set(600, 400, 800); scene.add(fill);
+const bb = new THREE.Box3(); scene.traverse(o => { if (o.isMesh && o !== ground) bb.expandByObject(o); });
+const ctr = bb.getCenter(new THREE.Vector3()), sz = bb.getSize(new THREE.Vector3());
+const cam = new THREE.PerspectiveCamera(cam0.fov, W / H, 1, 50000);
+const dist = Math.max(sz.x / (W / H), sz.z) / (2 * Math.tan(THREE.MathUtils.degToRad(cam0.fov / 2))) * cam0.zoom;
+const e = THREE.MathUtils.degToRad(cam0.elev), a = THREE.MathUtils.degToRad(cam0.azim);
+cam.position.set(ctr.x + dist * Math.cos(e) * Math.sin(a), dist * Math.sin(e), ctr.z + dist * Math.cos(e) * Math.cos(a));
+cam.lookAt(ctr.x, 0, ctr.z);
+renderer.render(scene, cam);
+const prj = ([x, y, h]) => { const v = new THREE.Vector3(x, h, -y).project(cam); return [(v.x + 1) / 2 * W * DPR, (1 - v.y) / 2 * H * DPR]; };
+const labels = {}, pins = {};
+for (const [k, v] of Object.entries(labelPts)) labels[k] = prj(v);
+for (const [k, v] of Object.entries(pinPts)) pins[k] = prj(v);
+window.__meta = {labels, pins};
+window.__png = renderer.domElement.toDataURL('image/png');
+window.__done = true;
+</script></body></html>

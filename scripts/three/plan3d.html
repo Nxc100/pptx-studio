@@ -1,0 +1,67 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>html,body{margin:0;background:transparent;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+</head><body>
+<script type="module">
+// 3D cut-away floor plan from prep_plan.py output. window.__CFG injected by render3d.py.
+import * as THREE from 'three';
+const cfg = window.__CFG;
+const [W, H] = cfg.size || [2600, 2000], DPR = cfg.dpr || 2;
+const cam0 = Object.assign({elev: 52, azim: -30, fov: 28, dist: 2600, tx: 0, tz: 0}, cfg.camera || {});
+const hx = s => parseInt(String(s).replace('#', ''), 16);
+const C = Object.assign({slab_top: 'E9DCC3', slab_side: '6A4A33', cap: '6A4A33', wall: 'F1E7D3', col_cap: '3B2E25', col_side: 'DCCCAE', edge: '8C7457'}, cfg.colors || {});
+const geo = await (await fetch(cfg.geo)).json();
+const cx = geo.W / 2, cy = geo.H / 2 + 40, WALL_H = cfg.wall_h || 80, hero = !!cfg.hero;
+const renderer = new THREE.WebGLRenderer({antialias: true, alpha: true, preserveDrawingBuffer: true});
+renderer.setPixelRatio(DPR); renderer.setSize(W, H); renderer.setClearColor(0, 0);
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+const toShape = pts => { const s = new THREE.Shape(); pts.forEach(([x, y], i) => i ? s.lineTo(x - cx, -(y - cy)) : s.moveTo(x - cx, -(y - cy))); s.closePath(); return s; };
+const toPath = pts => { const s = new THREE.Path(); pts.forEach(([x, y], i) => i ? s.lineTo(x - cx, -(y - cy)) : s.moveTo(x - cx, -(y - cy))); s.closePath(); return s; };
+function extrude(poly, depth, mats, y0 = 0) {
+  const sh = toShape(poly.outer); (poly.holes || []).forEach(h => sh.holes.push(toPath(h)));
+  const g = new THREE.ExtrudeGeometry(sh, {depth, bevelEnabled: false, curveSegments: 1});
+  g.rotateX(-Math.PI / 2); g.translate(0, y0, 0);
+  const m = new THREE.Mesh(g, mats); m.castShadow = true; m.receiveShadow = true; return m;
+}
+const SLAB = 14;
+scene.add(extrude({outer: geo.footprint}, SLAB, [new THREE.MeshStandardMaterial({color: hx(C.slab_top), roughness: .9}), new THREE.MeshStandardMaterial({color: hx(C.slab_side), roughness: .8})], -SLAB));
+const tex = await new THREE.TextureLoader().loadAsync(cfg.floor);
+tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(geo.W, geo.H), new THREE.MeshStandardMaterial({map: tex, alphaTest: 0.5, roughness: .85}));
+floor.rotation.x = -Math.PI / 2; floor.position.set(geo.W / 2 - cx, 0.6, geo.H / 2 - cy); floor.receiveShadow = true; scene.add(floor);
+const capMat = new THREE.MeshStandardMaterial({color: hx(C.cap), roughness: .75}), sideMat = new THREE.MeshStandardMaterial({color: hx(C.wall), roughness: .92});
+const edgeMat = new THREE.LineBasicMaterial({color: hx(C.edge), transparent: true, opacity: .55});
+const low = cfg.low_walls_x_gt;                      // e.g. balcony railings: walls right of x get low height
+for (const p of geo.walls) {
+  const minX = Math.min(...p.outer.map(v => v[0]));
+  const m = extrude(p, low && minX > low ? WALL_H * 0.42 : WALL_H, [capMat, sideMat]); scene.add(m);
+  scene.add(new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry, 30), edgeMat));
+}
+const colMats = [new THREE.MeshStandardMaterial({color: hx(C.col_cap), roughness: .7}), new THREE.MeshStandardMaterial({color: hx(C.col_side), roughness: .9})];
+for (const p of geo.columns) { const m = extrude(p, WALL_H + 4, colMats); scene.add(m); scene.add(new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry, 30), edgeMat)); }
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(6000, 6000), new THREE.ShadowMaterial({opacity: 0.22}));
+ground.rotation.x = -Math.PI / 2; ground.position.y = -SLAB - 0.5; ground.receiveShadow = true; scene.add(ground);
+scene.add(new THREE.HemisphereLight(0xFFF6E6, 0xB9A684, hero ? 0.75 : 1.05));
+const sun = new THREE.DirectionalLight(hero ? 0xFFD9A0 : 0xFFEBD0, hero ? 2.6 : 1.9);
+hero ? sun.position.set(-1000, 620, 760) : sun.position.set(-700, 1100, -350);
+sun.castShadow = true; sun.shadow.mapSize.set(4096, 4096);
+Object.assign(sun.shadow.camera, {left: -900, right: 900, top: 900, bottom: -900, near: 10, far: 4000}); sun.shadow.camera.updateProjectionMatrix();
+sun.shadow.radius = 4; sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.6; scene.add(sun);
+const fill = new THREE.DirectionalLight(0xFFF2E0, 0.35); fill.position.set(800, 600, 900); scene.add(fill);
+const cam = new THREE.PerspectiveCamera(cam0.fov, W / H, 10, 20000);
+const target = new THREE.Vector3(cam0.tx, 0, cam0.tz), e = THREE.MathUtils.degToRad(cam0.elev), a = THREE.MathUtils.degToRad(cam0.azim);
+cam.position.set(target.x + cam0.dist * Math.cos(e) * Math.sin(a), cam0.dist * Math.sin(e), target.z + cam0.dist * Math.cos(e) * Math.cos(a));
+cam.lookAt(target);
+renderer.render(scene, cam);
+const labels = {};
+for (const [k, [x, y]] of Object.entries(geo.labels || {})) {
+  const v = new THREE.Vector3(x - cx, 1, y - cy).project(cam);
+  labels[k] = [(v.x + 1) / 2 * W * DPR, (1 - v.y) / 2 * H * DPR];
+}
+window.__meta = {labels};
+window.__png = renderer.domElement.toDataURL('image/png');
+window.__done = true;
+</script></body></html>

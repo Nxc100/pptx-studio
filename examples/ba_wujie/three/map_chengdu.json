@@ -1,0 +1,3 @@
+{"page": "map3d.html", "name": "map_chengdu", "geojson": "geo/510100_full.json", "highlight": 510107, "pin": true,
+ "groups": {"510104": "B8BFA0", "510105": "A7B08E", "510106": "C2C7AB", "510108": "AFB794"},
+ "heights": {"base": 10, "group": 18, "highlight": 30}, "camera": {"elev": 58}, "size": [2600, 1800]}

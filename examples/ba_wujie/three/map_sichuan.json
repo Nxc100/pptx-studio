@@ -1,0 +1,3 @@
+{"page": "map3d.html", "name": "map_sichuan", "geojson": "geo/510000_full.json", "highlight": 510100,
+ "palette": {"regions": ["E6DCC3", "D6D9C1", "CDD2B6", "E2D5B8", "D9D2B5", "C7CDB0"]},
+ "heights": {"base": 8, "highlight": 34}, "camera": {"elev": 58}, "size": [2400, 1800]}

@@ -1,0 +1,2 @@
+{"page": "map3d.html", "name": "map_china", "geojson": "geo/100000_full.json", "highlight": 510000,
+ "special_contains": "JD", "heights": {"base": 7, "highlight": 22}, "camera": {"elev": 60}, "size": [2400, 1800]}

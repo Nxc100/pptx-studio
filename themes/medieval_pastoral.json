@@ -1,0 +1,48 @@
+{
+  "name": "Medieval Pastoral",
+  "description": "欧洲中世纪田园风：羊皮纸底 + 橄榄绿 + 赤陶 + 古金线；罗马拱券相框；橄榄枝/薰衣草/玫瑰藤水彩；哥特四叶饰；蜡封",
+  "asset_dir": "medieval_pastoral",
+  "colors": {
+    "paper": "F4EDE0",
+    "ink": "3B2E25",
+    "ink_soft": "6B5B4D",
+    "primary": "5E6B3D",
+    "primary_dk": "4A5530",
+    "primary_lt": "9AA483",
+    "accent": "B0623A",
+    "accent2": "8E3B2E",
+    "extra": "C98E84",
+    "line": "B08D57",
+    "line_lt": "CDB386",
+    "card": "EFE3CC",
+    "muted": "D5D9C2",
+    "deep": "6A4A33"
+  },
+  "fonts": {"head": "Noto Serif SC", "body": "Microsoft YaHei", "latin": "Palatino Linotype"},
+  "frame": "arch",
+  "deco": {
+    "paper": "paper.jpg",
+    "corner_tl": "corner_tl.png",
+    "branch_tr": "branch_tr.png",
+    "sprig_br": "sprig.png",
+    "garland": "garland.png",
+    "ornament": "ornament.png",
+    "bullet": "bullet.png",
+    "node": "node.png",
+    "divider": "divider.png",
+    "seal": "seal.png",
+    "watermark": "watermark.png",
+    "floaters": ["floater1.png", "floater2.png", "floater3.png"]
+  },
+  "icons": {"dir": "icons", "primary": "primary", "light": "light", "accent": "accent"},
+  "text": {"pill": "INTERIOR  DESIGN", "part_word": "The Part", "folio": "— {n:02d} —"},
+  "transitions": {
+    "cover":    ["p15:curtains", 2400],
+    "contents": ["fade", 900],
+    "section":  ["p15:pageCurlDouble", 1700],
+    "content":  ["fade", 800],
+    "gallery":  ["p14:gallery", 1600, {"dir": "l"}],
+    "board":    ["p15:prestige", 1600],
+    "end":      ["p15:curtains", 2400]
+  }
+}

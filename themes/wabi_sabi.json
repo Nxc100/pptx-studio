@@ -1,0 +1,89 @@
+{
+  "name": "Wabi Sabi",
+  "description": "侘寂：灰白灰泥底 + 炭灰 + 陶土 + 石色线；圆角矩形相框；干枝/蒲苇色调植物",
+  "asset_dir": "wabi_sabi",
+  "colors": {
+    "paper": "EEE9E1",
+    "ink": "2F2B27",
+    "ink_soft": "6A625A",
+    "primary": "7A7266",
+    "primary_dk": "3F3A34",
+    "primary_lt": "A9A08F",
+    "accent": "A0715A",
+    "accent2": "5C4A3D",
+    "extra": "B9A58E",
+    "line": "9C8F7E",
+    "line_lt": "C9BFB0",
+    "card": "E6DFD3",
+    "muted": "DCD5CA",
+    "deep": "4E4339"
+  },
+  "fonts": {
+    "head": "Noto Serif SC",
+    "body": "Microsoft YaHei",
+    "latin": "Palatino Linotype"
+  },
+  "frame": "rrect",
+  "deco": {
+    "paper": "paper.jpg",
+    "corner_tl": "corner_tl.png",
+    "branch_tr": "branch_tr.png",
+    "sprig_br": "sprig.png",
+    "garland": "garland.png",
+    "ornament": "ornament.png",
+    "bullet": "bullet.png",
+    "node": "node.png",
+    "divider": "divider.png",
+    "seal": "seal.png",
+    "watermark": "watermark.png",
+    "floaters": [
+      "floater1.png",
+      "floater2.png",
+      "floater3.png"
+    ]
+  },
+  "icons": {
+    "dir": "icons",
+    "primary": "primary",
+    "light": "light",
+    "accent": "accent"
+  },
+  "text": {
+    "pill": "INTERIOR  DESIGN",
+    "part_word": "The Part",
+    "folio": "— {n:02d} —"
+  },
+  "transitions": {
+    "cover": [
+      "p15:drape",
+      2000
+    ],
+    "contents": [
+      "fade",
+      1000
+    ],
+    "section": [
+      "p14:reveal",
+      1600
+    ],
+    "content": [
+      "fade",
+      700
+    ],
+    "gallery": [
+      "p14:pan",
+      1200,
+      {
+        "dir": "u"
+      }
+    ],
+    "board": [
+      "fade",
+      1200
+    ],
+    "end": [
+      "p15:drape",
+      2000
+    ]
+  }
+}

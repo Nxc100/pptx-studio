@@ -1,0 +1,2 @@
+{"page": "plan3d.html", "name": "plan3d", "geo": "plan_work/plan_geo.json", "floor": "plan_work/floor_tex.png",
+ "wall_h": 80, "low_walls_x_gt": 1145, "camera": {"elev": 52, "azim": -30, "fov": 28, "dist": 2600}, "size": [2600, 2200]}

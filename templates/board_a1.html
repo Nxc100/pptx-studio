@@ -1,0 +1,148 @@
+<!-- Exhibition board template (A1 landscape, 1682x1188 CSS px = 2px/mm). Placeholders: {{ASSETS}} project assets dir, {{THEME}} theme asset dir, {{C.<colour>}} theme palette (hex incl. #), {{F.head|body|latin}} fonts. Edit the text/blocks for each project; keep the 3-column grid. Render: scripts/board/render_html.py -->
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+:root{--parch:{{C.paper}};--cream:{{C.card}};--ink:{{C.ink}};--soft:{{C.ink_soft}};--olive:{{C.primary}};--olivedk:{{C.primary_dk}};--sage:{{C.primary_lt}};--terra:{{C.accent}};--brick:{{C.accent2}};--rose:{{C.extra}};--gold:{{C.line}};--walnut:{{C.deep}}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1682px;height:1188px;overflow:hidden;background:var(--parch) url({{THEME}}/paper.jpg) center/cover;font-family:'{{F.body}}',sans-serif;color:var(--ink);position:relative}
+.serif{font-family:'{{F.head}}',serif}
+.lat{font-family:'{{F.latin}}',serif;font-style:italic}
+.frame{position:absolute;inset:18px;border:1.5px solid var(--gold);pointer-events:none}
+.frame2{position:absolute;inset:26px;border:0.6px solid rgba(176,141,87,.6);pointer-events:none}
+.corner{position:absolute;width:120px;height:120px;background:url({{THEME}}/corner_filigree.png) center/contain no-repeat;opacity:.9}
+.abs{position:absolute}
+h2{font-family:'{{F.head}}',serif;font-weight:700;font-size:21px;color:var(--olivedk);display:flex;align-items:center;gap:8px;margin-bottom:8px}
+h2 i{display:inline-block;width:15px;height:15px;background:url({{THEME}}/bullet.png) center/contain no-repeat}
+h2 small{font-family:'{{F.latin}}',serif;font-style:italic;font-weight:400;font-size:11px;letter-spacing:2px;color:var(--gold);text-transform:uppercase}
+p{font-size:12.5px;line-height:1.65;color:var(--soft)}
+.rule{height:12px;background:url({{THEME}}/divider.png) center/contain no-repeat;margin:6px 0}
+.card{background:rgba(255,255,255,.38);border:1px solid rgba(176,141,87,.55);padding:12px 14px}
+.arch{border-radius:999px 999px 0 0;overflow:hidden}
+.ph{background-size:cover;background-position:center}
+.sw{display:flex;gap:7px}
+.sw div{flex:1;height:64px;border-radius:40px 40px 0 0;position:relative}
+.sw span{position:absolute;bottom:-34px;left:-6px;right:-6px;text-align:center;font-size:10.5px;color:var(--ink);font-family:'{{F.head}}',serif;font-weight:700;line-height:1.25}
+.sw span em{display:block;font-style:normal;font-weight:400;font-size:9px;color:var(--gold);font-family:'{{F.latin}}',serif}
+.thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.thumbs div{height:128px;position:relative;border:1px solid rgba(176,141,87,.6)}
+.thumbs div b{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,rgba(59,46,37,.75));color:#fff;font-family:'{{F.head}}',serif;font-size:12px;padding:14px 8px 5px}
+.pill{display:inline-block;padding:4px 12px;border-radius:20px;font-family:'{{F.head}}',serif;font-weight:700;font-size:12px;color:#fff;margin:0 4px 6px 0}
+.zone{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px}
+.zone u{display:block;width:18px;height:26px;border-radius:10px 10px 0 0;flex:none;border:1px solid rgba(176,141,87,.6)}
+.zone div{font-size:11.5px;line-height:1.45;color:var(--soft)}
+.zone div b{font-family:'{{F.head}}',serif;color:var(--ink);font-size:13px}
+.mat{display:flex;gap:14px}
+.mat div{text-align:center;flex:1}
+.mat div i{display:block;width:74px;height:74px;border-radius:50%;margin:0 auto 6px;background-size:cover;background-position:center;border:2px solid #fff;box-shadow:0 0 0 1px var(--gold),0 3px 8px rgba(59,46,37,.25)}
+.mat div b{font-family:'{{F.head}}',serif;font-size:12px}
+.mat div em{display:block;font-style:normal;font-size:10px;color:var(--gold)}
+.maps{display:flex;align-items:center;gap:6px}
+.maps img{height:96px}
+.chev{color:var(--gold);font-size:16px}
+</style></head>
+<body>
+<div class="frame"></div><div class="frame2"></div>
+<div class="corner" style="left:20px;top:20px"></div>
+<div class="corner" style="right:20px;bottom:20px;transform:rotate(180deg)"></div>
+<img class="abs" src="{{THEME}}/branch_tr.png" style="right:22px;top:20px;width:330px;opacity:.95">
+
+<!-- header -->
+<div class="abs" style="left:70px;top:52px;width:760px">
+  <div class="lat" style="font-size:14px;letter-spacing:4px;color:var(--gold);font-style:normal">2026 · INTERIOR DESIGN · EXHIBITION BOARD</div>
+  <div class="serif" style="font-size:66px;font-weight:700;color:var(--olivedk);line-height:1.15;margin-top:4px"><span class="lat" style="font-weight:400">Ba</span> · 无界森居</div>
+  <div class="serif" style="font-size:20px;margin-top:2px">欧洲中世纪田园风 · 住宅室内空间设计</div>
+</div>
+<img class="abs" src="{{THEME}}/seal.png" style="left:640px;top:58px;width:78px">
+<div class="abs" style="left:860px;top:70px;width:440px">
+  <div class="lat" style="font-size:13px;color:var(--soft);line-height:1.6">“ Every arch opens onto the warmth of home. ”</div>
+  <div class="serif" style="font-size:16px;margin-top:8px;color:var(--ink)">把一座中世纪的乡间庄园，轻轻放进成都的城市楼宇之间。</div>
+  <div style="font-size:12.5px;margin-top:12px;color:var(--soft)"><b class="serif" style="color:var(--gold)">设计</b>　刘诗云　20240073294　　<b class="serif" style="color:var(--gold)">地点</b>　四川省成都市武侯区</div>
+</div>
+<div class="abs rule" style="left:70px;top:178px;width:1240px"></div>
+
+<!-- left column -->
+<div class="abs" style="left:70px;top:205px;width:500px">
+  <h2><i></i>设计说明<small>Statement</small></h2>
+  <p>本案为年轻三口之家的城市平层住宅（户型 12.26 m × 12.00 m，三室两厅一卫）。以“无界森居”为题，将欧洲中世纪乡村庄园的罗马拱券、红砖、仿古砖、碎花布艺与手工铁艺带入都市居所；以连续的拱形门洞代替封闭门扇，让玄关、饭厅、客厅与休闲区彼此贯通，使阳光、绿意与家人的日常自由流动。</p>
+  <div style="height:18px"></div>
+  <h2><i></i>区位分析<small>Location</small></h2>
+  <div class="maps">
+    <img src="{{ASSETS}}/3d/map_china.png"><span class="chev">›</span>
+    <img src="{{ASSETS}}/3d/map_sichuan.png"><span class="chev">›</span>
+    <img src="{{ASSETS}}/3d/map_chengdu.png" style="height:104px">
+  </div>
+  <div style="display:flex;gap:10px;align-items:center;margin-top:6px">
+    <img src="{{ASSETS}}/3d/map_wuhou.png" style="width:220px">
+    <p style="font-size:11.5px">武侯区地处成都中心城区西南部，北连青羊区，东隔锦江毗邻锦江区，南接高新区与双流区；武侯祠·锦里、四川大学、华西医院、望江楼公园环绕，文脉深厚、配套成熟。</p>
+  </div>
+  <div style="height:14px"></div>
+  <h2><i></i>色彩分析<small>Palette 60 · 30 · 10</small></h2>
+  <div class="sw" style="margin-bottom:42px">
+    <div style="background:#F1E7D8;border:1px solid {{C.line_lt}}"><span>奶油白<em>#F1E7D8</em></span></div>
+    <div style="background:#E3CDAE"><span>暖杏<em>#E3CDAE</em></span></div>
+    <div style="background:#C99A6B"><span>蜂蜜原木<em>#C99A6B</em></span></div>
+    <div style="background:#6E4B35"><span>胡桃木<em>#6E4B35</em></span></div>
+    <div style="background:#B0623A"><span>赤陶红<em>#B0623A</em></span></div>
+    <div style="background:#7E2E2B"><span>酒红<em>#7E2E2B</em></span></div>
+    <div style="background:#C98E84"><span>玫瑰粉<em>#C98E84</em></span></div>
+    <div style="background:#6E7B4B"><span>橄榄绿<em>#6E7B4B</em></span></div>
+  </div>
+  <h2><i></i>材质分析<small>Materials</small></h2>
+  <div class="mat">
+    <div><i style="background-image:url({{ASSETS}}/photos/mat_living.jpg)"></i><b>实木地板</b><em>客厅 · 休闲区</em></div>
+    <div><i style="background-image:url({{ASSETS}}/photos/mat_dining.jpg)"></i><b>仿古砖拼花</b><em>饭厅 · 门厅</em></div>
+    <div><i style="background-image:url({{ASSETS}}/photos/mat_bath.jpg)"></i><b>仿古石材</b><em>卫浴 · 阳台</em></div>
+    <div><i style="background-image:url({{ASSETS}}/crops/sub_brick.jpg)"></i><b>红砖饰面</b><em>拱门</em></div>
+    <div><i style="background-image:url({{ASSETS}}/crops/sub_fabric.jpg)"></i><b>碎花布艺</b><em>沙发 · 窗帘</em></div>
+  </div>
+</div>
+
+<!-- middle column -->
+<div class="abs" style="left:600px;top:205px;width:520px">
+  <h2><i></i>三维户型鸟瞰<small>3D Axonometric</small></h2>
+  <img src="{{ASSETS}}/3d/plan3d.png" style="width:520px;display:block">
+  <div style="display:flex;gap:12px;margin-top:4px">
+    <div style="width:250px">
+      <h2 style="font-size:18px"><i></i>功能分区<small>Zoning</small></h2>
+      <img src="{{ASSETS}}/3d/plan3d_zones.png" style="width:250px;display:block">
+    </div>
+    <div style="flex:1;padding-top:34px">
+      <div class="zone"><u style="background:#E8B99A"></u><div><b>动区</b>　客厅 · 休闲区 · 餐厅 · 门厅 · 厨房<br>居中串联，拱门贯通</div></div>
+      <div class="zone"><u style="background:#B7C09F"></u><div><b>静区</b>　主卧 · 小孩房 · 书房兼客房<br>分置角部，安静私密</div></div>
+      <div class="zone"><u style="background:#E3CF9F"></u><div><b>辅助区</b>　卫浴 · 衣帽间 · 阳台<br>干湿分离，就近服务</div></div>
+      <div style="margin-top:8px">
+        <span class="pill" style="background:var(--olive)">拱券</span><span class="pill" style="background:var(--terra)">红砖</span><span class="pill" style="background:var(--olive)">仿古砖</span>
+        <span class="pill" style="background:var(--terra)">碎花</span><span class="pill" style="background:var(--olive)">铁艺</span><span class="pill" style="background:var(--terra)">原木</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- right column -->
+<div class="abs" style="left:1150px;top:205px;width:462px">
+  <h2><i></i>效果图展示<small>Renderings</small></h2>
+  <div style="position:relative;height:500px">
+    <div class="abs" style="left:-9px;top:-9px;width:480px;height:518px;border:1.2px solid var(--gold);border-radius:999px 999px 0 0"></div>
+    <div class="arch ph" style="width:462px;height:500px;background-image:url({{ASSETS}}/photos/living1.jpg);background-position:55% 50%;box-shadow:0 6px 18px rgba(59,46,37,.3)"></div>
+    <div class="abs serif" style="left:16px;bottom:12px;color:#fff;font-weight:700;font-size:16px;text-shadow:0 1px 4px rgba(0,0,0,.6)">客厅 · Living Room</div>
+  </div>
+  <div class="thumbs" style="margin-top:18px">
+    <div class="ph" style="background-image:url({{ASSETS}}/photos/living2.jpg)"><b>客厅 · 壁炉墙</b></div>
+    <div class="ph" style="background-image:url({{ASSETS}}/photos/dining1.jpg)"><b>饭厅 · 红砖拱券</b></div>
+    <div class="ph" style="background-image:url({{ASSETS}}/photos/dining2.jpg)"><b>饭厅 · 拱窗镜</b></div>
+    <div class="ph" style="background-image:url({{ASSETS}}/photos/master_bed.jpg)"><b>主卧</b></div>
+    <div class="ph" style="background-image:url({{ASSETS}}/photos/second_bed.jpg)"><b>书房兼客房</b></div>
+    <div class="ph" style="background-image:url({{ASSETS}}/photos/kids.jpg)"><b>儿童房</b></div>
+  </div>
+</div>
+
+<div class="abs" style="left:70px;top:1012px;width:1050px">
+  <h2><i></i>设计理念<small>Concept · 无界 · 森 · 居</small></h2>
+  <div style="display:flex;gap:22px">
+    <div style="flex:1;display:flex;gap:12px;align-items:flex-start"><div class="serif" style="flex:none;width:50px;height:50px;border-radius:50%;background:var(--olive);color:#fff;font-size:24px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px {{C.paper}},0 0 0 4px var(--gold)">无</div><p style="font-size:12px"><b class="serif" style="color:var(--ink);font-size:14px">无界 · Boundless</b><br>连续的罗马拱券代替门扇，玄关—饭厅—客厅—休闲区一气呵成。</p></div>
+    <div style="flex:1;display:flex;gap:12px;align-items:flex-start"><div class="serif" style="flex:none;width:50px;height:50px;border-radius:50%;background:var(--terra);color:#fff;font-size:24px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px {{C.paper}},0 0 0 4px var(--gold)">森</div><p style="font-size:12px"><b class="serif" style="color:var(--ink);font-size:14px">森 · Forest</b><br>碎花布艺、绿植、原木与赤陶，把田野与花园的气息带进室内。</p></div>
+    <div style="flex:1;display:flex;gap:12px;align-items:flex-start"><div class="serif" style="flex:none;width:50px;height:50px;border-radius:50%;background:var(--brick);color:#fff;font-size:24px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px {{C.paper}},0 0 0 4px var(--gold)">居</div><p style="font-size:12px"><b class="serif" style="color:var(--ink);font-size:14px">居 · Dwelling</b><br>以壁炉、烛台吊灯与长餐桌为家的中心，温暖、安定、可传承。</p></div>
+  </div>
+</div>
+<div class="abs lat" style="right:64px;bottom:42px;font-size:12px;color:var(--gold);letter-spacing:2px;font-style:normal">BOUNDLESS FOREST DWELLING · A MEDIEVAL PASTORAL HOME IN CHENGDU</div>
+</body></html>

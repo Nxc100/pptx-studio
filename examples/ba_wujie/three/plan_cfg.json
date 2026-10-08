@@ -1,0 +1,18 @@
+{"color_plan": "../assets/photos/plan_color.png", "line_plan": "../assets/photos/plan_line.png",
+ "wall_rgb": [181, 163, 136], "wall_tol": 22, "column_rgb": [75, 75, 75], "column_tol": 60, "bbox": [195, 80, 1175, 1100],
+ "footprint": [[200,180],[405,180],[405,82],[792,82],[792,157],[1055,157],[1055,638],[1170,638],[1170,1095],[200,1098]],
+ "zone_colors": {"active": "E8B99A", "quiet": "B7C09F", "service": "E3CF9F"},
+ "rooms": {
+  "书房/客房": {"rect": [245,195,445,440], "zone": "quiet", "label": [345,320]},
+  "卫浴": {"rect": [445,85,725,440], "zone": "service", "label": [590,260]},
+  "小孩房": {"rect": [735,170,1040,440], "zone": "quiet", "label": [890,330]},
+  "厨房": {"rect": [245,475,445,690], "zone": "active", "label": [345,580]},
+  "休闲区": {"rect": [455,470,600,690], "zone": "active", "label": [530,580]},
+  "客厅": {"rect": [600,470,1040,800], "zone": "active", "label": [830,640]},
+  "门厅": {"rect": [470,690,590,890], "zone": "active", "label": [530,790]},
+  "餐厅": {"rect": [230,690,470,890], "zone": "active", "label": [350,790]},
+  "楼梯间": {"rect": [205,890,590,1090], "zone": "service", "label": [400,990]},
+  "衣帽间": {"rect": [600,830,725,1080], "zone": "service", "label": [665,960]},
+  "主卧": {"rect": [735,800,970,1080], "zone": "quiet", "label": [850,950]},
+  "阳台": {"rect": [975,640,1165,1085], "zone": "service", "label": [1075,880]}},
+ "out": "plan_work"}
